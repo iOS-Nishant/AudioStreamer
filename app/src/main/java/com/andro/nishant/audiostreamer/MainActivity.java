@@ -1,34 +1,27 @@
 package com.andro.nishant.audiostreamer;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import android.app.ProgressDialog;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.app.ProgressDialog;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements OnClickListener {
 
-
+    AudioPlayerView audioPlayerViewObj;
     ProgressDialog pd;
-
     final String LogTag = "StreamAudioDemo";
     Button mainButton ;
     TextView errorTextView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +34,8 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
         errorTextView = (TextView)findViewById(R.id.errorTextViewId);
         errorTextView.setText("Click above button to start..");
 
-
+        audioPlayerViewObj = new AudioPlayerView(getApplicationContext());
+        audioPlayerViewObj.mainActivityObj = this;
     }
 
     @Override
@@ -51,7 +45,33 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
         pd.setMessage("Buffering.....");
         pd.show();
         errorTextView.setText("");
-        //audioSeekBar.setProgress(0);
+        audioPlayerViewObj.audioSeekBar.setProgress(0);
+
+        /*
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setDataAndType(Uri.parse(SongUrl), "audio/*");
+            this.startActivity(i);
+        }
+        */
+
+        try
+        {
+
+            audioPlayerViewObj.mp = new MediaPlayer();
+            audioPlayerViewObj.mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            audioPlayerViewObj.mp.setOnPreparedListener(audioPlayerViewObj);
+            audioPlayerViewObj.mp.setOnErrorListener(audioPlayerViewObj);
+            audioPlayerViewObj.mp.setDataSource(audioPlayerViewObj.SongUrl);
+            audioPlayerViewObj.mp.prepareAsync();
+            audioPlayerViewObj.mp.setOnCompletionListener(audioPlayerViewObj);
+        }
+
+        catch(Exception e) {
+            Log.e(LogTag, e.getMessage());
+            this.errorTextView.setText("Error : " + e.getMessage());
+            Toast.makeText(getApplicationContext(), "Error : " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

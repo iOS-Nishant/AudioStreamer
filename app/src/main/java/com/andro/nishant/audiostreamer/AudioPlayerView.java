@@ -12,9 +12,10 @@ import android.widget.Toast;
 /**
  * Created by NishantThite on 01/07/15.
  */
-public class AudioPlayerView extends View implements View.OnClickListener,
+public class AudioPlayerView extends View implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener{
 
+    MainActivity mainActivityObj;
     MediaPlayer mp;
     SeekBar audioSeekBar;
     final String SongUrl = "http://appstore.creoinvent.co.in/Audio/WalkRain.mp3";
@@ -24,54 +25,18 @@ public class AudioPlayerView extends View implements View.OnClickListener,
         super(context);
         this.context = context;
         audioSeekBar = (SeekBar) findViewById(R.id.audioSeekBarId);
-        audioSeekBar.setProgress(0);
-        audioSeekBar.setOnSeekBarChangeListener(this);
-
-
     }
 
-    @Override
-    public void onClick(View v) {
-
-        audioSeekBar.setProgress(0);
-
-        /*
-        try {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setDataAndType(Uri.parse(SongUrl), "audio/*");
-            this.startActivity(i);
-        }
-        */
-
-        try
-        {
-
-            mp = new MediaPlayer();
-            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mp.setOnPreparedListener(this);
-            mp.setOnErrorListener(this);
-            mp.setDataSource(SongUrl);
-            mp.prepareAsync();
-            mp.setOnCompletionListener(this);
-        }
-
-
-        catch(Exception e)
-        {
-            Log.e(LogTag, e.getMessage());
-            //errorTextView.setText("Error : "+e.getMessage());
-            Toast.makeText(context, "Error : "+e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
     @Override
     public void onPrepared(MediaPlayer mp) {
-
+        audioSeekBar.setOnSeekBarChangeListener(this);
+        audioSeekBar.setProgress(0);
         audioSeekBar.setMax(mp.getDuration());
         audioSeekBar.postDelayed(onEverySecond, 1000);
 
         Toast.makeText(context, "Prepare finished", Toast.LENGTH_LONG).show();
         Log.i(LogTag, "Prepare finished");
-       // pd.setMessage("Playing.....");
+        mainActivityObj.pd.setMessage("Playing.....");
         mp.start();
     }
 
@@ -79,15 +44,15 @@ public class AudioPlayerView extends View implements View.OnClickListener,
     public boolean onError(MediaPlayer mp, int what, int extra) {
 
         String errorStr = "onError MediaPlayer : "+ what+" and "  + extra;
-       // errorTextView.setText(errorStr);
+        mainActivityObj.errorTextView.setText(errorStr);
         Toast.makeText(context, errorStr, Toast.LENGTH_LONG).show();
-       // pd.dismiss();
+        mainActivityObj.pd.dismiss();
         return false;
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-       // pd.dismiss();
+        mainActivityObj.pd.dismiss();
         //Toast.makeText(getApplicationContext(), "Completed", Toast.LENGTH_LONG).show();
     }
 
