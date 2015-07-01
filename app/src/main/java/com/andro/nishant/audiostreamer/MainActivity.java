@@ -1,5 +1,8 @@
 package com.andro.nishant.audiostreamer;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,11 +18,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements OnClickListener,
-        OnPreparedListener, OnErrorListener, OnCompletionListener {
+        OnPreparedListener, OnErrorListener, OnCompletionListener, SeekBar.OnSeekBarChangeListener {
 
     MediaPlayer mp;
     ProgressDialog pd;
@@ -27,6 +31,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
     final String LogTag = "StreamAudioDemo";
     Button mainButton ;
     TextView errorTextView;
+    SeekBar audioSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +43,51 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
         errorTextView = (TextView)findViewById(R.id.errorTextViewId);
         errorTextView.setText("Click above button to start..");
+
+        audioSeekBar = (SeekBar) findViewById(R.id.audioSeekBarId);
+        audioSeekBar.setProgress(0);
+        audioSeekBar.setOnSeekBarChangeListener(this);
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+
+        audioSeekBar.setMax(mp.getDuration());
+        audioSeekBar.postDelayed(onEverySecond, 1000);
+
         Toast.makeText(getApplicationContext(), "Prepare finished", Toast.LENGTH_LONG).show();
         Log.i(LogTag, "Prepare finished");
         pd.setMessage("Playing.....");
         mp.start();
     }
 
+    private Runnable onEverySecond=new Runnable() {
+        @Override
+        public void run() {
+
+            if(audioSeekBar != null) {
+                audioSeekBar.setProgress(mp.getCurrentPosition());
+            }
+
+            if(mp.isPlaying()) {
+                audioSeekBar.postDelayed(onEverySecond, 1000);
+            }
+        }
+    };
+
     @Override
     public void onClick(View v) {
         errorTextView.setText("");
+        audioSeekBar.setProgress(0);
+
+        /*
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setDataAndType(Uri.parse(SongUrl), "audio/*");
+            this.startActivity(i);
+        }
+        */
+
         try
         {
             pd = new ProgressDialog(this);
@@ -64,6 +101,8 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
             mp.prepareAsync();
             mp.setOnCompletionListener(this);
         }
+
+
         catch(Exception e)
         {
             Log.e(LogTag, e.getMessage());
@@ -85,7 +124,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
     @Override
     public void onCompletion(MediaPlayer mp) {
         pd.dismiss();
-        Toast.makeText(getApplicationContext(), "Completed", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "Completed", Toast.LENGTH_LONG).show();
     }
 
 
@@ -109,5 +148,23 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if(fromUser) {
+            // this is when actually seekbar has been seeked to a new position
+            mp.seekTo(progress);
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 }
