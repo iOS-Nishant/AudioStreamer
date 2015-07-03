@@ -1,6 +1,12 @@
 package com.andro.nishant.audiostreamer;
 
 
+import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.ActionBarActivity;
@@ -12,6 +18,7 @@ import android.app.ProgressDialog;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +43,13 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
 
         audioPlayerViewObj = new AudioPlayerView(getApplicationContext());
         audioPlayerViewObj.mainActivityObj = this;
+        audioPlayerViewObj.audioSeekBar = (SeekBar) findViewById(R.id.audioSeekBarId);
+
+        audioPlayerViewObj.audioSeekBar.setProgress(40);
+        audioPlayerViewObj.audioSeekBar.setSecondaryProgress(75);
+
     }
+
 
     @Override
     public void onClick(View v) {
@@ -45,8 +58,9 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
         pd.setMessage("Buffering.....");
         pd.show();
         errorTextView.setText("");
-        audioPlayerViewObj.audioSeekBar.setProgress(0);
 
+        audioPlayerViewObj.audioSeekBar.setProgress(0);
+        audioPlayerViewObj.audioSeekBar.setSecondaryProgress(0);
         /*
         try {
             Intent i = new Intent(Intent.ACTION_VIEW);
@@ -57,14 +71,19 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
 
         try
         {
+            if (audioPlayerViewObj.mp == null)
+                audioPlayerViewObj.mp = new MediaPlayer();
+            else
+                audioPlayerViewObj.mp.reset();
 
-            audioPlayerViewObj.mp = new MediaPlayer();
             audioPlayerViewObj.mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             audioPlayerViewObj.mp.setOnPreparedListener(audioPlayerViewObj);
             audioPlayerViewObj.mp.setOnErrorListener(audioPlayerViewObj);
             audioPlayerViewObj.mp.setDataSource(audioPlayerViewObj.SongUrl);
-            audioPlayerViewObj.mp.prepareAsync();
+            audioPlayerViewObj.mp.setOnBufferingUpdateListener(audioPlayerViewObj);
             audioPlayerViewObj.mp.setOnCompletionListener(audioPlayerViewObj);
+
+            audioPlayerViewObj.mp.prepareAsync();
         }
 
         catch(Exception e) {

@@ -1,42 +1,45 @@
 package com.andro.nishant.audiostreamer;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
 
 /**
  * Created by NishantThite on 01/07/15.
  */
 public class AudioPlayerView extends View implements
-        MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener{
+        MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener,
+        SeekBar.OnSeekBarChangeListener, OnBufferingUpdateListener{
 
+    public int bufferPercent=0;
     MainActivity mainActivityObj;
     MediaPlayer mp;
     SeekBar audioSeekBar;
-    final String SongUrl = "http://appstore.creoinvent.co.in/Audio/WalkRain.mp3";
+    final String SongUrl = "http://appstore.creoinvent.co.in/Audio/WalkRain";
     final String LogTag = "StreamAudioDemo";
     Context context;
     public AudioPlayerView(Context context) {
         super(context);
         this.context = context;
-        audioSeekBar = (SeekBar) findViewById(R.id.audioSeekBarId);
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+
         audioSeekBar.setOnSeekBarChangeListener(this);
         audioSeekBar.setProgress(0);
+        audioSeekBar.setSecondaryProgress(bufferPercent);
         audioSeekBar.setMax(mp.getDuration());
         audioSeekBar.postDelayed(onEverySecond, 1000);
 
         Toast.makeText(context, "Prepare finished", Toast.LENGTH_LONG).show();
         Log.i(LogTag, "Prepare finished");
         mainActivityObj.pd.setMessage("Playing.....");
+        mainActivityObj.pd.dismiss();
         mp.start();
     }
 
@@ -47,6 +50,12 @@ public class AudioPlayerView extends View implements
         mainActivityObj.errorTextView.setText(errorStr);
         Toast.makeText(context, errorStr, Toast.LENGTH_LONG).show();
         mainActivityObj.pd.dismiss();
+
+        mp.release();
+        mp = null;
+        audioSeekBar.setProgress(0);
+        bufferPercent = 0 ;
+        audioSeekBar.setSecondaryProgress( bufferPercent);
         return false;
     }
 
@@ -62,6 +71,7 @@ public class AudioPlayerView extends View implements
 
             if(audioSeekBar != null) {
                 audioSeekBar.setProgress(mp.getCurrentPosition());
+                audioSeekBar.setSecondaryProgress( bufferPercent);
             }
 
             if(mp.isPlaying()) {
@@ -88,4 +98,22 @@ public class AudioPlayerView extends View implements
 
     }
 
+    @Override
+    public void onBufferingUpdate(MediaPlayer mp, int percent) {
+
+        bufferPercent = percent;
+
+        Log.d(LogTag, "\n MediaPlayer buffer Percent: " + bufferPercent + "\n\n");
+
+
+        mainActivityObj.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                audioSeekBar.setSecondaryProgress( bufferPercent);
+                mainActivityObj.errorTextView.setText("buffer Percent: " + bufferPercent);
+            }
+        });
+
+
+    }
 }
