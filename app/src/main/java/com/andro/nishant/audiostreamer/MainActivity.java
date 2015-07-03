@@ -123,9 +123,9 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
             for(int i=0; i < jsonArray.length(); i++){
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                int id = Integer.parseInt(jsonObject.optString("id").toString());
+                String id = jsonObject.optString("id").toString();
                 String name = jsonObject.optString("name").toString();
-                float salary = Float.parseFloat(jsonObject.optString("salary").toString());
+                String salary = jsonObject.optString("salary").toString();
 
                 data += "Node"+i+" : \n id= "+ id +" \n Name= "+ name +" \n Salary= "+ salary +" \n ";
             }
