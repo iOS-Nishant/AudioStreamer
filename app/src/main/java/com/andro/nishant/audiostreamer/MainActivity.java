@@ -54,6 +54,12 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
 
     public void performNetworkOperationOnBackThread (View v){
 
+        if (audioPlayerViewObj.mp != null){
+            audioPlayerViewObj.mp.stop();
+            audioPlayerViewObj.mp.release();
+        }
+
+
         errorTextView.setText("Loading..");
         pd = new ProgressDialog(this);
         pd.setMessage("Loading..");
@@ -72,9 +78,8 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
     public void loadJsonString(){
         try {
 
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
-            StrictMode.setThreadPolicy(policy);
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
 
             // Create a URL for the desired page
             URL url = new URL("https://iosish.iriscouch.com/nishant/TestNishant");
@@ -111,10 +116,9 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
     public void parseMyJson() {
         pd.dismiss();
         TextView jsonOutputTextView = (TextView) findViewById(R.id.errorTextViewId);
-        //strJson=" {        \"Employee\" :[         {            \"id\":\"01\",            \"name\":\"Gopal Varma\",            \"salary\":\"500000\"        },        {            \"id\":\"02\",            \"name\":\"Sairamkrishna\",           \"salary\":\"500000\" }, {\"id\":\"03\", \"name\":\"Sathish kallakuri\", \"salary\":\"600000\"}] }";
         String data = "";
         try {
-            JSONObject  jsonRootObject = new JSONObject(strJson);
+            JSONObject jsonRootObject = new JSONObject(strJson);
 
             //Get the instance of JSONArray that contains JSONObjects
             JSONArray jsonArray = jsonRootObject.optJSONArray("Employee");
@@ -123,9 +127,9 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
             for(int i=0; i < jsonArray.length(); i++){
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                String id = jsonObject.optString("id").toString();
-                String name = jsonObject.optString("name").toString();
-                String salary = jsonObject.optString("salary").toString();
+                String id = jsonObject.optString("id");
+                String name = jsonObject.optString("name");
+                String salary = jsonObject.optString("salary");
 
                 data += "Node"+i+" : \n id= "+ id +" \n Name= "+ name +" \n Salary= "+ salary +" \n ";
             }
@@ -148,7 +152,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
 
         errorTextView.setText("");
         pd = new ProgressDialog(this);
-        pd.setMessage("Buffering.....");
+        pd.setMessage("Buffering...");
         pd.show();
 
         audioPlayerViewObj.audioSeekBar.setProgress(0);

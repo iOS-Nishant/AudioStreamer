@@ -52,7 +52,6 @@ public class AudioPlayerView extends View implements
         mainActivityObj.pd.dismiss();
 
         mp.release();
-        mp = null;
         audioSeekBar.setProgress(0);
         bufferPercent = 0 ;
         audioSeekBar.setSecondaryProgress( bufferPercent);
@@ -69,12 +68,10 @@ public class AudioPlayerView extends View implements
         @Override
         public void run() {
 
-            if(audioSeekBar != null) {
+            if(audioSeekBar != null && mp.isPlaying()) {
                 audioSeekBar.setProgress(mp.getCurrentPosition());
                 audioSeekBar.setSecondaryProgress( bufferPercent);
-            }
 
-            if(mp.isPlaying()) {
                 audioSeekBar.postDelayed(onEverySecond, 1000);
             }
         }
@@ -109,7 +106,7 @@ public class AudioPlayerView extends View implements
         mainActivityObj.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                audioSeekBar.setSecondaryProgress( bufferPercent);
+                audioSeekBar.setSecondaryProgress(bufferPercent);
                 mainActivityObj.errorTextView.setText("buffer Percent: " + bufferPercent);
             }
         });
