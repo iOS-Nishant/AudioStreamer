@@ -1,16 +1,12 @@
 package com.andro.nishant.audiostreamer;
 
 
-import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +17,12 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 public class MainActivity extends ActionBarActivity implements OnClickListener {
 
@@ -29,6 +31,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
     final String LogTag = "StreamAudioDemo";
     Button mainButton ;
     TextView errorTextView;
+    String strJson= "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,19 +48,108 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
         audioPlayerViewObj.mainActivityObj = this;
         audioPlayerViewObj.audioSeekBar = (SeekBar) findViewById(R.id.audioSeekBarId);
 
-        audioPlayerViewObj.audioSeekBar.setProgress(40);
-        audioPlayerViewObj.audioSeekBar.setSecondaryProgress(75);
-
+//        audioPlayerViewObj.audioSeekBar.setProgress(40);
+//        audioPlayerViewObj.audioSeekBar.setSecondaryProgress(75);
     }
 
+    public void performNetworkOperationOnBackThread (View v){
 
-    @Override
-    public void onClick(View v) {
+        errorTextView.setText("Loading..");
+        pd = new ProgressDialog(this);
+        pd.setMessage("Loading..");
+        pd.show();
+
+        Thread thread = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                loadJsonString();
+            }
+        });
+
+        thread.start();
+    }
+
+    public void loadJsonString(){
+        try {
+
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+            StrictMode.setThreadPolicy(policy);
+
+            // Create a URL for the desired page
+            URL url = new URL("https://iosish.iriscouch.com/nishant/TestNishant");
+
+            Log.e(LogTag, "\nLoding data from server\n");
+
+            // Read all the text returned by the server
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            String str;
+            while ((str = in.readLine()) != null) {
+                // str is one line of text; readLine() strips the newline character(s)
+               // Log.e(LogTag, "\nData from server : "+str+"\n");
+                strJson = str;
+            }
+            Log.e(LogTag, "\nAfter completion from server strJson: "+strJson+"\n");
+           // strJson = str;
+            in.close();
+
+            if(strJson.length()>1){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        parseMyJson();
+                    }
+                });
+            }
+        } catch (Exception e) {
+            String errStr = "Error in loadJsonString: " + e;
+           // this.errorTextView.setText(errStr);
+            Log.e(LogTag, errStr);
+        }
+    }
+
+    public void parseMyJson() {
+        pd.dismiss();
+        TextView jsonOutputTextView = (TextView) findViewById(R.id.errorTextViewId);
+        //strJson=" {        \"Employee\" :[         {            \"id\":\"01\",            \"name\":\"Gopal Varma\",            \"salary\":\"500000\"        },        {            \"id\":\"02\",            \"name\":\"Sairamkrishna\",           \"salary\":\"500000\" }, {\"id\":\"03\", \"name\":\"Sathish kallakuri\", \"salary\":\"600000\"}] }";
+        String data = "";
+        try {
+            JSONObject  jsonRootObject = new JSONObject(strJson);
+
+            //Get the instance of JSONArray that contains JSONObjects
+            JSONArray jsonArray = jsonRootObject.optJSONArray("Employee");
+
+            //Iterate the jsonArray and print the info of JSONObjects
+            for(int i=0; i < jsonArray.length(); i++){
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                int id = Integer.parseInt(jsonObject.optString("id").toString());
+                String name = jsonObject.optString("name").toString();
+                float salary = Float.parseFloat(jsonObject.optString("salary").toString());
+
+                data += "Node"+i+" : \n id= "+ id +" \n Name= "+ name +" \n Salary= "+ salary +" \n ";
+            }
+            jsonOutputTextView.setText(data);
+
+            jsonOutputTextView.setMovementMethod(new ScrollingMovementMethod());
+
+            audioPlayerViewObj.audioSeekBar.setVisibility(View.GONE);
+
+        } catch (JSONException e) {
+            String errStr = "Error in parseMyJson: " + e.getMessage();
+            this.errorTextView.setText(errStr);
+            Log.e(LogTag, errStr);
+        }
+    }
+
+    public void startAudioStreaming(View v){
+
+        audioPlayerViewObj.audioSeekBar.setVisibility(View.VISIBLE);
+
         errorTextView.setText("");
         pd = new ProgressDialog(this);
         pd.setMessage("Buffering.....");
         pd.show();
-        errorTextView.setText("");
 
         audioPlayerViewObj.audioSeekBar.setProgress(0);
         audioPlayerViewObj.audioSeekBar.setSecondaryProgress(0);
@@ -87,10 +179,16 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
         }
 
         catch(Exception e) {
-            Log.e(LogTag, e.getMessage());
-            this.errorTextView.setText("Error : " + e.getMessage());
-            Toast.makeText(getApplicationContext(), "Error : " + e.getMessage(), Toast.LENGTH_LONG).show();
+            String errStr = "Error : " + e.getMessage();
+            this.errorTextView.setText(errStr);
+            Log.e(LogTag, errStr);
+            Toast.makeText(getApplicationContext(), errStr, Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        startAudioStreaming(v);
     }
 
     @Override

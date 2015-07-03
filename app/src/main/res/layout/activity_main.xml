@@ -1,36 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
-<Button
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="Stream Audio and Play"
-    android:id="@+id/play"
-    />
+    android:layout_height="fill_parent"
+    android:background="#66D4D4D4">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stream Audio"
+        android:id="@+id/play"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Large Text"
         android:id="@+id/errorTextViewId"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:maxHeight="230dp"
+        android:scrollbars = "vertical"
+        android:layout_marginTop="63dp"
+        android:layout_below="@+id/loadJSONbuttonId"
+        android:layout_centerHorizontal="true"
+        android:singleLine="false"
+        android:minHeight="230dp"
+        android:background="#55ffBB33"
+        android:gravity="center_horizontal" />
 
     <SeekBar
         android:layout_width="fill_parent"
         android:layout_height="30dp"
         android:id="@+id/audioSeekBarId"
-        android:layout_marginBottom="86dp"
         android:minHeight="30dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:progressDrawable="@drawable/customseekbarlayout"
-        />
+        android:layout_below="@+id/play"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="48dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Load JSON"
+        android:id="@+id/loadJSONbuttonId"
+        android:layout_marginTop="80dp"
+        android:onClick="performNetworkOperationOnBackThread"
+        android:layout_below="@+id/audioSeekBarId"
+        android:layout_centerHorizontal="true" />
 
     <!-- style="@style/tallerBarStyle" -->
 </RelativeLayout>
