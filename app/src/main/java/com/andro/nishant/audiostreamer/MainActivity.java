@@ -1,9 +1,9 @@
 package com.andro.nishant.audiostreamer;
 
 
+import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -36,6 +36,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
         mainButton = (Button)findViewById(R.id.play);
@@ -63,6 +64,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
         errorTextView.setText("Loading..");
         pd = new ProgressDialog(this);
         pd.setMessage("Loading..");
+
         pd.show();
 
         Thread thread = new Thread(new Runnable(){

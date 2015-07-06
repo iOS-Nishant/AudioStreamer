@@ -99,18 +99,15 @@ public class AudioPlayerView extends View implements
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
 
         bufferPercent = percent;
-
-        Log.d(LogTag, "\n MediaPlayer buffer Percent: " + bufferPercent + "\n\n");
-
-
         mainActivityObj.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                audioSeekBar.setIndeterminate(false);
                 audioSeekBar.setSecondaryProgress(bufferPercent);
-                mainActivityObj.errorTextView.setText("buffer Percent: " + bufferPercent);
+                String updateMsg = "\n buffer Percent: " + bufferPercent+"\tSecondaryProgress: "+audioSeekBar.getSecondaryProgress()+ "\n\n";
+                mainActivityObj.errorTextView.setText(updateMsg);
+                Log.d(LogTag, updateMsg );
             }
         });
-
-
     }
 }
