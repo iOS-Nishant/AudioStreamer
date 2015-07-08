@@ -1,6 +1,8 @@
 package com.andro.nishant.audiostreamer;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -24,11 +26,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-public class MainActivity extends ActionBarActivity implements OnClickListener {
+public class MainActivity extends Activity implements OnClickListener {
 
     AudioPlayerView audioPlayerViewObj;
     ProgressDialog pd;
-    final String LogTag = "StreamAudioDemo";
+    static final String LogTag = "StreamAudioDemo";
     Button mainButton ;
     TextView errorTextView;
     String strJson= "";
@@ -42,7 +44,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
         mainButton = (Button)findViewById(R.id.play);
         mainButton.setOnClickListener(this);
 
-        errorTextView = (TextView)findViewById(R.id.errorTextViewId);
+        errorTextView = (TextView)findViewById(R.id.aTextViewId);
         errorTextView.setText("Click above button to start..");
 
         audioPlayerViewObj = new AudioPlayerView(getApplicationContext());
@@ -51,6 +53,13 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
 
 //        audioPlayerViewObj.audioSeekBar.setProgress(40);
 //        audioPlayerViewObj.audioSeekBar.setSecondaryProgress(75);
+    }
+
+    public void showStoryListScreen(View v){
+        Intent afterLoginIntent = new Intent(getBaseContext(), StoryList.class);
+        afterLoginIntent.putExtra("USERNAME",  "Nishant");
+        startActivityForResult(afterLoginIntent, 0);
+
     }
 
     public void performNetworkOperationOnBackThread (View v){
@@ -117,7 +126,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener {
 
     public void parseMyJson() {
         pd.dismiss();
-        TextView jsonOutputTextView = (TextView) findViewById(R.id.errorTextViewId);
+        TextView jsonOutputTextView = (TextView) findViewById(R.id.aTextViewId);
         String data = "";
         try {
             JSONObject jsonRootObject = new JSONObject(strJson);

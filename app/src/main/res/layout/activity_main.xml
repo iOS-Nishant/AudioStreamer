@@ -13,21 +13,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Large Text"
-        android:id="@+id/errorTextViewId"
-        android:maxHeight="230dp"
-        android:scrollbars = "vertical"
-        android:layout_marginTop="63dp"
-        android:layout_below="@+id/loadJSONbuttonId"
-        android:layout_centerHorizontal="true"
-        android:singleLine="false"
-        android:minHeight="230dp"
-        android:background="#55ffBB33"
-        android:gravity="center_horizontal" />
+
 
     <SeekBar
         android:layout_width="fill_parent"
@@ -36,19 +22,48 @@
         android:minHeight="30dp"
         android:progressDrawable="@drawable/customseekbarlayout"
         android:layout_below="@+id/play"
+        android:layout_marginTop="10dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="48dp" />
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Load JSON"
         android:id="@+id/loadJSONbuttonId"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="43dp"
         android:onClick="performNetworkOperationOnBackThread"
         android:layout_below="@+id/audioSeekBarId"
         android:layout_centerHorizontal="true" />
 
     <!-- style="@style/tallerBarStyle" -->
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Large Text"
+        android:id="@+id/aTextViewId"
+        android:maxHeight="230dp"
+        android:scrollbars = "vertical"
+        android:singleLine="false"
+        android:minHeight="230dp"
+        android:background="#55ffBB33"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/loadJSONbuttonId"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Story list"
+        android:id="@+id/storyListbuttonId"
+        android:layout_marginTop="15dp"
+        android:onClick="showStoryListScreen"
+        android:layout_below="@+id/aTextViewId"
+        android:layout_centerHorizontal="true" />
+
+
 </RelativeLayout>
